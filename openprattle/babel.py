@@ -24,7 +24,20 @@ except ModuleNotFoundError:
 except Exception:
     # Some other error occurred; print an error but continue.
     logging.error("Found but could not load python pybel bindings; falling back to obabel executable", exc_info = True)
-    
+
+# Formats that are broken with either pybel or obabel.
+# TODO: We should try and record which versions of obabel these are broken with; they may get fixed in the future. 
+FORBIDDEN = {
+    "PYBEL": (
+        # Results in core-dump, or an empty file depending on version.
+        "cdx",
+        # Results in core-dump.
+        "mcdl"
+    ),
+    "OBABEL": (
+
+    )
+}
 
 class Openbabel_converter():
     """
@@ -142,7 +155,7 @@ class Openbabel_converter():
         """
         input_file_type = input_file_type if input_file_type else ""
 
-        if not HAVE_PYBEL or input_file_type.lower() == "cdx":
+        if not HAVE_PYBEL or input_file_type.lower() in FORBIDDEN['PYBEL']:
             return Obabel_converter
         
         else:
@@ -262,6 +275,13 @@ if HAVE_PYBEL:
             if not output_file_type:
                 output_file_type = self.type_from_file_name(output_file)
 
+            # Check the formats are allowed.
+            if self.input_file_type in FORBIDDEN['PYBEL']:
+                raise ValueError("The '{}' format is not supported by pybel, try obabel instead".format(self.input_file_type))
+        
+            #if output_file_type in FORBIDDEN['PYBEL']:
+            #    raise ValueError("The '{}' format is not supported by pybel, try obabel instead".format(output_file_type))
+
             if output_file is None and output_file_type == "png":
                 raise ValueError("output_file must not be None if format is png")
             
@@ -379,6 +399,13 @@ class Obabel_converter(Openbabel_converter):
 
         if not output_file_type:
             output_file_type = self.type_from_file_name(output_file)
+
+        # Check the formats are allowed.
+        if self.input_file_type in FORBIDDEN['OBABEL']:
+            raise ValueError("The '{}' format is not supported by obabel, try pybel instead".format(self.input_file_type))
+    
+        #if output_file_type in FORBIDDEN['OBABEL']:
+        #    raise ValueError("The '{}' format is not supported by obabel, try pybel instead".format(output_file_type))
         
         # For Obabel, gen3D defaults to False, because we can't determine ahead of time whether we're in 3D or not (unless format is cdx, which is always 2D).
         if gen3D is None:
@@ -480,15 +507,26 @@ class Openbabel_formats():
     ABC for classes that retrieve available formats.
     """
 
-    def read(self):
+    TYPE_NAME = "GENERIC"
+
+    def read(self, *args, **kwargs):
+        forms = self._read(*args, **kwargs)
+        
+        # Remove any exclusions.
+        return {key: value for key, value in forms.items() if key not in FORBIDDEN[self.TYPE_NAME]}
+
+    def _read(self):
         """
         Retrieve supported input (read) formats.
 
         The return value is a dictionary of formats. Each key is the format shortcode (which can be used as input_file_type). Each value is a description of the format.
         """
         raise NotImplementedError("Implement in subclass")
+    
+    def write(self, *args, **kwargs):
+        return self._write(*args, **kwargs)
 
-    def write(self):
+    def _write(self):
         """
         Retrieve supported write (output) formats.
 
@@ -502,7 +540,9 @@ if HAVE_PYBEL:
         Class for retrieving the supported file formats from pybel.
         """
 
-        def read(self):
+        TYPE_NAME = "PYBEL"
+
+        def _read(self):
             """
             Retrieve supported input (read) formats.
 
@@ -510,7 +550,7 @@ if HAVE_PYBEL:
             """
             return pybel.informats
 
-        def write(self):
+        def _write(self):
             """
             Retrieve supported write (output) formats.
 
@@ -523,7 +563,9 @@ class Obabel_formats(Openbabel_formats):
     """
     Class for retrieving the supported file formats from obabel.
     """
-    
+
+    TYPE_NAME = "OBABEL"
+
     # Bit of a hack.
     obabel_execuable = Obabel_converter.obabel_execuable
     
@@ -568,7 +610,7 @@ class Obabel_formats(Openbabel_formats):
         return formats
 
     
-    def read(self, refresh = False):
+    def _read(self, refresh = False):
         """
         Retrieve supported input (read) formats.
 
@@ -576,20 +618,20 @@ class Obabel_formats(Openbabel_formats):
         """
         if refresh:
             try:
-                del self.__class__._read
+                del self.__class__._read_formats
             
             except AttributeError:
                 pass
         
         try:
-            return self.__class__._read
+            return self.__class__._read_formats
         
         except AttributeError:
             # Cache miss.
-            self.__class__._read = self.run("read")
-            return self.__class__._read
+            self.__class__._read_formats = self.run("read")
+            return self.__class__._read_formats
         
-    def write(self, refresh = False):
+    def _write(self, refresh = False):
         """
         Retrieve supported write (output) formats.
 
@@ -597,18 +639,18 @@ class Obabel_formats(Openbabel_formats):
         """
         if refresh:
             try:
-                del self.__class__._write
+                del self.__class__._write_formats
             
             except AttributeError:
                 pass
         
         try:
-            return self.__class__._write
+            return self.__class__._write_formats
         
         except AttributeError:
             # Cache miss.
-            self.__class__._write = self.run("write")
-            return self.__class__._write
+            self.__class__._write_formats = self.run("write")
+            return self.__class__._write_formats
 
 def formats(backend = "Auto"):
     if backend != "Obabel" and HAVE_PYBEL:
