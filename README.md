@@ -11,7 +11,7 @@ Python >= 3.9
 
 # Optional
 
-JSON
+JSON (for printing in JSON format with the --readable and --writable options)
 
 ## Why?
 
