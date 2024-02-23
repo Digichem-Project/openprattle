@@ -1,4 +1,4 @@
-"""Test the openprattle library."""
+"""Test the supported formats."""
 
 import pytest
 from pathlib import Path
@@ -16,8 +16,6 @@ BACKENDS = [
 
 READ_FORMATS = formats().read()
 WRITE_FORMATS = formats().write()
-
-
 
 @pytest.mark.formats
 @pytest.mark.parametrize("backend", BACKENDS)
