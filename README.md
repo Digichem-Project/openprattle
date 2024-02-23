@@ -2,6 +2,17 @@
 
 A command-line tool and python library that provides a seamless interface to both the [Pybel library](https://github.com/openbabel/openbabel) and [obabel](https://github.com/openbabel/openbabel) command-line tool.
 
+## Dependencies
+
+# Required
+
+Openbabel >= 3.0.0
+Python >= 3.9
+
+# Optional
+
+JSON
+
 ## Why?
 
 On the surface, the pybel library and obabel tool appear to offer the same functionality. However, there are important instances where each offers functionality over the other. For example, pybel allows for the molecular charge and multiplicity to be set in some output formats, obabel does not.
