@@ -56,7 +56,14 @@ class Openbabel_converter():
         self.add_H = True
         
     @classmethod
-    def from_file(self, *, input_file = None, input_file_buffer = None, input_file_path = None, input_file_type = None, **kwargs):
+    def from_file(self, *,
+        input_file = None,
+        input_file_buffer = None,
+        input_file_path = None,
+        input_file_type = None,
+        backend = "Auto",
+        **kwargs
+    ):
         """
         A more powerful constructor that automatically decides which concrete class to use.
         """
@@ -65,7 +72,14 @@ class Openbabel_converter():
             input_file_type = self.type_from_file_name(input_file_path)
         
         # Next, decide which class
-        cls = self.get_cls(input_file_type)
+        if backend == "Pybel":
+            cls = Pybel_converter
+
+        elif backend == "Obabel":
+            cls = Obabel_converter
+        
+        else:
+            cls = self.get_cls(input_file_type)
         
         # And return.
         return cls(
@@ -596,8 +610,8 @@ class Obabel_formats(Openbabel_formats):
             self.__class__._write = self.run("write")
             return self.__class__._write
 
-def formats():
-    if HAVE_PYBEL:
+def formats(backend = "Auto"):
+    if backend != "Obabel" and HAVE_PYBEL:
         return Pybel_formats()
     
     else:

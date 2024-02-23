@@ -23,6 +23,7 @@ def main():
     parser.add_argument("-C", "--charge", help = "The molecular charge to set in the output format. Note that not all formats support a charge.", default = None, type = int)
     parser.add_argument("-M", "--multiplicity", help = "The multiplicity to set in the output format. Note that not all formats support a multiplicity", default = None, type = int)
     parser.add_argument("--gen3D", help = "Whether to optimise the input coordinates via a rapid force-field optimisation. This option is useful for converting 1D or 2D formats to 3D. The default (Auto) is to only optimise coordinates that are not already in 3 dimensions.", choices = ["True", "Auto", "False"])
+    parser.add_argument("--backend", help = "Force the user of a particular backend", choices = ["Auto", "Pybel", "Obabel"])
     
     parser.add_argument("--bindings", help = "Determine whether the pybel bindings are available", action = "store_true")
     parser.add_argument("--readable", help = "List readable (input) formats", action = "store_true")
@@ -42,7 +43,7 @@ def main():
         exit(0)
     
     elif args.readable or args.writable:
-        format = formats()
+        format = formats(args.backend)
 
         if args.json:
             import json
@@ -68,7 +69,8 @@ def main():
     converter = Openbabel_converter.from_file(
         input_file_path = args.input_file if args.input_file != "-" else None,
         input_file = sys.stdin if args.input_file == "-" else None,
-        input_file_type = args.input_format
+        input_file_type = args.input_format,
+        backend = args.backend
     )
 
     # Handle gen3D.
