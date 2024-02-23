@@ -6,16 +6,7 @@ from pathlib import Path
 from openprattle.babel import Openbabel_converter, Pybel_converter, Obabel_converter
 from openprattle.babel import formats
 
-from test import DATA
-
-# List of supported converters.
-BACKENDS = [
-    Pybel_converter,
-    Obabel_converter
-]
-
-READ_FORMATS = formats().read()
-WRITE_FORMATS = formats().write()
+from test import DATA, BACKENDS, WRITE_FORMATS, READ_FORMATS
 
 @pytest.mark.formats
 @pytest.mark.parametrize("backend", BACKENDS)
