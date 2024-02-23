@@ -2,6 +2,7 @@
 import subprocess
 from subprocess import CalledProcessError
 import re
+import sys
 import os
 import copy
 from pathlib import Path
@@ -155,6 +156,77 @@ class Openbabel_converter():
         
 
 if HAVE_PYBEL:
+
+    class ObErrorLog_wrapper():
+        """
+        Class for wrapping the logging begaviour of openbabel and pybel.
+        """
+
+        def __init__(self, warnings_as_errors = True):
+            """
+            :param stream: The output stream to wrap.
+            :param warnings_as_errors: Whether to raise an exception on obabel warnings (normally a good idea)
+            """
+            self.stream = sys.stderr
+            self.stream_no = self.stream.fileno()
+            self.pre_logs = {}
+            self.warnings_as_errors = warnings_as_errors
+
+        def __enter__(self):
+            """
+            Wrap logging output.
+            """
+            # Clear logs.
+            errors = pybel.ob.obErrorLog.ClearLog()
+
+            self.stream_back = os.dup(self.stream_no)
+            self.devnull = open(os.devnull, "w")
+            os.dup2(self.devnull.fileno(), self.stream_no)
+
+            return self
+        
+        def __exit__(self, type, value, traceback):
+            """
+            Stop wrapping.
+            """
+            self.devnull.close()
+            os.dup2(self.stream_back, self.stream_no)
+
+            log_levels = [
+                (pybel.ob.obDebug, logging.DEBUG),
+                (pybel.ob.obAuditMsg, logging.DEBUG),
+                (pybel.ob.obInfo, logging.INFO),
+            ]
+
+            error_levels = [
+                pybel.ob.obError
+            ]
+
+            if self.warnings_as_errors:
+                error_levels.append(pybel.ob.obWarning)
+            
+            else:
+                log_levels.append((pybel.ob.obWarning, logging.WARNING))
+
+            # Print any messages.
+            for oblevel, level in log_levels:
+                for log in pybel.ob.obErrorLog.GetMessagesOfLevel(oblevel):
+                    logging.log(level, log)
+
+            # Generate exceptions.
+            exceptions = []
+            for oblevel in error_levels:
+                exceptions.extend([Exception("OpenBabel error:\n{}".format(log)) for log in pybel.ob.obErrorLog.GetMessagesOfLevel(oblevel)])
+            
+            # Chain them together.
+            for index, exception in enumerate(exceptions[:-1]):
+                exception.__cause__ = exceptions[index +1]
+
+            # Raise the first.
+            if len(exceptions) > 0:
+                raise exceptions[0]
+
+
     class Pybel_converter(Openbabel_converter):
         """
         Wrapper class for pybel
@@ -179,42 +251,45 @@ if HAVE_PYBEL:
             if output_file is None and output_file_type == "png":
                 raise ValueError("output_file must not be None if format is png")
             
+            # In general, Openbabel logging from python is mess.
+            # Some pybel function calls don't correctly indicate error status, instead relying on message logging.
+            # From python, we have no way to redirect the openbabel logger, so we need to hack it.
+            # The ObErrorLog_wrapper() handles this.
+            
+            # For Pybel, gen3D defaults to True, because we'll only use gen3d if not already in 3D.
+            gen3D = gen3D if gen3D is not None else True
+            
+            # Get upset if input_file_type is empty (because openbabel acts weird when it is).
+            if self.input_file_type is None or self.input_file_type == "":
+                raise TypeError("Cannot convert file; input_file_type '{}' is None or empty".format(self.input_file_type))
+            
+            # Pybel doesn't provide a method to read from an open file, weirdly.
+            # This means we need to load the whole file into memory first.
+            # TODO: Investigate the pybel/openbabel lib to see if there's a better workaround.
+            if self.input_file:
+                buffer = self.input_file.read()
+            
+            elif self.input_file_buffer:
+                buffer = self.input_file_buffer
+            
+            else:
+                buffer = None
+            
+            # Read in the molecule(s) in the given file.
             try:
-                # Stop logging from pybel, we'll handle that ourselves.
-                pybel.ob.obErrorLog.StopLogging()
-                
-                # For Pybel, gen3D defaults to True, because we'll only use gen3d if not already in 3D.
-                gen3D = gen3D if gen3D is not None else True
-                
-                # Get upset if input_file_type is empty (because openbabel acts weird when it is).
-                if self.input_file_type is None or self.input_file_type == "":
-                    raise TypeError("Cannot convert file; input_file_type '{}' is None or empty".format(self.input_file_type))
-                
-                # Pybel doesn't provide a method to read from an open file, weirdly.
-                # This means we need to load the whole file into memory first.
-                # TODO: Investigate the pybel/openbabel lib to see if there's a better workaround.
-                if self.input_file:
-                    buffer = self.input_file.read()
-                
-                elif self.input_file_buffer:
-                    buffer = self.input_file_buffer
-                
-                else:
-                    buffer = None
-                
-                # Read in the molecule(s) in the given file.
-                try:
-                    # This is a generator.
-                    # Use a different func depending on whether we're reading from file or memory.
-                    if buffer:
-                        # Reading from memory.
-                        # TODO: Why str()?
+                # This is a generator.
+                # Use a different func depending on whether we're reading from file or memory.
+                if buffer:
+                    # Reading from memory.
+                    # TODO: Why str()?
+                    with ObErrorLog_wrapper():
                         molecule = pybel.readstring(self.input_file_type, str(buffer))
-                    
-                    else: 
-                        # Readfile gives us an iterator of molecules...
+                
+                else: 
+                    # Readfile gives us an iterator of molecules...
+                    with ObErrorLog_wrapper():
                         molecules = pybel.readfile(self.input_file_type, str(self.input_file_path))
-                        
+                    
                         # ...but we're only ever interested in one.
                         # Try and get the first molecule.
                         try:
@@ -222,38 +297,43 @@ if HAVE_PYBEL:
                         
                         except StopIteration:
                             raise ValueError("Cannot read file '{}'; file does not contain any molecules".format(self.input_name)) from None
-                        
-                        
-                except Exception as e:
-                    raise Exception("Failed to parse file '{}'".format(self.input_name)) from e
-                
-                if charge is not None:
+                    
+                    
+            except Exception as e:
+                raise Exception("Failed to parse file '{}'".format(self.input_name)) from e
+            
+            if charge is not None:
+                with ObErrorLog_wrapper(False):
                     molecule.OBMol.SetTotalCharge(charge)
-                    
-                if multiplicity is not None:
+                
+            if multiplicity is not None:
+                with ObErrorLog_wrapper(False):
                     molecule.OBMol.SetTotalSpinMultiplicity(multiplicity)
+            
+            # If we got a 2D (or 1D) format, convert to 3D (but warn that we are doing so.)
+            if molecule.dim != 3 and gen3D:
+                # We're missing 3D coords.
+                with ObErrorLog_wrapper(False):
+                    dim = molecule.dim
+
+                logging.warning("Generating 3D coordinates from {}D file '{}'; this will scramble atom coordinates".format(dim, self.input_name))
                 
-                # If we got a 2D (or 1D) format, convert to 3D (but warn that we are doing so.)
-                if molecule.dim != 3 and gen3D:
-                    # We're missing 3D coords.
-                    logging.warning("Generating 3D coordinates from {}D file '{}'; this will scramble atom coordinates".format(molecule.dim, self.input_name))
+                with ObErrorLog_wrapper(False):
                     molecule.localopt()
-                    
-                if self.add_H:
-                    # Add hydrogens.
-                    molecule.addh()
                 
-                # Now convert and return
-                # If the format is png, use the draw() method instead because write() is bugged.
+            if self.add_H:
+                # Add hydrogens.
+                with ObErrorLog_wrapper(False):
+                    molecule.addh()
+            
+            # Now convert and return
+            # If the format is png, use the draw() method instead because write() is bugged.
+            with ObErrorLog_wrapper():
                 if output_file_type == "png":
                     molecule.draw(False, output_file)
                 
                 else:
                     return molecule.write(output_file_type, output_file, overwrite = True)
-            
-            finally:
-                # Start logging again.
-                pybel.ob.obErrorLog.StartLogging()
 
 
 class Obabel_converter(Openbabel_converter):
@@ -373,7 +453,9 @@ class Obabel_converter(Openbabel_converter):
         # We'll do basic error checking on whether our output contains a certain string.
         #if not self.obabel_success.search(done_process.stderr):
         if self.obabel_fail.search(done_process.stderr):
-            raise Exception("obabel command did not appear to complete successfully") from CalledProcessError(done_process.returncode, " ".join(done_process.args), done_process.stdout, done_process.stderr)
+            raise Exception("obabel command '{}' did not output an expected value; instead got:\nSTDOUT:\n{}\nSTDERR:\n{}".format(
+                " ".join(done_process.args), done_process.stdout, done_process.stderr)
+            )
         
         # Return our output.
         return done_process.stdout if output_file is None else None
