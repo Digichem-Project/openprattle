@@ -7,11 +7,13 @@ A command-line tool and python library that provides a seamless interface to bot
 ### Required
 
 Openbabel >= 3.0.0
+
 Python >= 3.9
 
 ### Optional
 
 JSON (for printing in JSON format with the --readable and --writable options)
+
 pytest (for running the unit tests)
 
 ## Usage
