@@ -5,7 +5,7 @@ import pytest
 from pathlib import Path
 import copy
 
-from openprattle.babel import Openbabel_converter
+from openprattle import Openbabel_converter
 
 from test import DATA, BACKENDS, FORMAT_BACKENDS
 

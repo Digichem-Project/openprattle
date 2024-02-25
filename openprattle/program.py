@@ -4,7 +4,7 @@ import sys
 import argparse
 
 import openprattle
-from openprattle.babel import Openbabel_converter, HAVE_PYBEL, formats
+from openprattle import Openbabel_converter, HAVE_PYBEL, formats
 
 def main():
     """

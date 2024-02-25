@@ -3,9 +3,6 @@
 import pytest
 from pathlib import Path
 
-from openprattle.babel import Openbabel_converter, Pybel_converter, Obabel_converter
-from openprattle.babel import formats
-
 from test import DATA, BACKENDS, WRITE_FORMATS, READ_FORMATS
 
 @pytest.mark.formats

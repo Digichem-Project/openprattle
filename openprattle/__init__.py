@@ -33,8 +33,13 @@ else:
 
 openbabel_version = "3.1.0"
 if frozen:
+    import os
     # We need to tell openbabel where its library components are.
     os.environ['BABEL_LIBDIR'] = str(Path(sys._MEIPASS, "openbabel", "lib", openbabel_version))
     
     # And also data.
     os.environ['BABEL_DATADIR'] = str(Path(sys._MEIPASS, "openbabel", "data", openbabel_version))
+
+# Convenience imports.
+from .babel import Openbabel_converter, Obabel_converter, Pybel_converter, HAVE_PYBEL,\
+    formats, Obabel_formats, Pybel_formats

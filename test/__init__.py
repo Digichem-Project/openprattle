@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from openprattle.babel import Pybel_converter, Obabel_converter, formats, Pybel_formats, Obabel_formats
+from openprattle import Pybel_converter, Obabel_converter, formats, Pybel_formats, Obabel_formats
 
 # List of supported converters.
 BACKENDS = [
