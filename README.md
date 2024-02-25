@@ -210,6 +210,33 @@ $ oprattle Benzene.cdx -O Benzene.cml --charge 1 --multiplicity 2 --gen3D True
 The same caveats for charge, multiplicity, and gen3D apply as for the OpenPrattle library
 (see above).
 
+To see a list of supported input and output formats, use the ``--readable`` and ``--writable`` options:
+
+```bash
+$ oprattle --readable
+abinit     : ABINIT Output Format
+acesout    : ACES output format
+acr        : ACR format
+...
+```
+
+```bash
+$ oprattle --writable
+acesin     : ACES input format
+adf        : ADF cartesian input format
+alc        : Alchemy format
+...
+```
+
+Either `--readable` or `--writable` can be combined with `--json` (if the JSON library is available)
+to print the list of formats in JSON format:
+
+```bash
+$ oprattle --readable --json
+"abinit": "ABINIT Output Format", "acesout": "ACES output format", "acr": "ACR format"...
+```
+
+
 ## Why?
 
 On the surface, the pybel library and obabel tool appear to offer the same functionality. However, there are important instances where each offers functionality over the other. For example, pybel allows for the molecular charge and multiplicity to be set in some output formats, obabel does not.
