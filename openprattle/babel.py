@@ -170,17 +170,22 @@ class Openbabel_converter():
             return self.input_file_path
         else:
             return "(file loaded from memory)"
-        
-    def convert(self, output_file_type = None):
+
+    def convert(self, output_file_type = None, output_file = None, *, gen3D = None, charge = None, multiplicity = None):
         """
         Convert the input file wrapped by this class to the designated output_file_type.
         
         Inheriting classes should write their own implementation.
         
         :param output_file_type: The file type to convert to.
+        :param output_file: Optional file name to write to. If not given, the converted file will be returned as a string (or binary string depending on format).
+        :param gen3D: If True and the loaded molecule does not have 3D coordinates, these will be generated (this will scramble atom coordinates).
+        :param charge: Optional charge of the output format.
+        :param multiplicity: Optional multiplicity of the output format.
+        :return: The converted file, or None if output_file is not None.
         """
         raise NotImplementedError("Abstract class Babel_converter does not have a convert() method defined (inheriting classes should write their own)")
-        
+
 
 if HAVE_PYBEL:
 
