@@ -126,6 +126,7 @@ The following is a non-exhaustive list of formats that do support charge and mul
 Of these, only dalmol is both a readable and writable format.
 
 [!IMPORTANT]
+
 Currently, OpenPrattle is not aware of which formats will preserve the specified charge
 and multiplicity. If an unsupported format is chosen, any charge and multiplicity information
 will be silently discarded.
