@@ -1,6 +1,6 @@
 # OpenPrattle
 
-A command-line tool and python library that provides a seamless interface to both the [Pybel library](https://github.com/openbabel/openbabel) and [obabel](https://github.com/openbabel/openbabel) command-line tool.
+A command-line tool and python library that provides a seamless interface to both the [Pybel library](https://github.com/openbabel/openbabel/tree/master/scripts/python) and [obabel](https://github.com/openbabel/openbabel) command-line tool.
 
 ## Dependencies
 
@@ -20,7 +20,7 @@ pytest (for running the unit tests)
 
 OpenPrattle provides both a python library and command-line tool.
 
-### Library.
+### Library
 
 Files are interconverted using converter objects, each of which represents a supported backend.
 To automatically get a suitable converter object, use `openprattle.Openbabel_converter.from_file()`:
@@ -120,8 +120,8 @@ The following is a non-exhaustive list of formats that do support charge and mul
  - dalmol (DALTON input)
  - gau (Gaussian input)
  - gjc (Gaussian input)
-  -gjf (Gaussian input)
-  -gzmat (Gaussian Z-Matrix Input)
+ - gjf (Gaussian input)
+ - gzmat (Gaussian Z-Matrix Input)
 
 Of these, only dalmol is both a readable and writable format.
 
