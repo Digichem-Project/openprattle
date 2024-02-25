@@ -125,11 +125,10 @@ The following is a non-exhaustive list of formats that do support charge and mul
 
 Of these, only dalmol is both a readable and writable format.
 
-[!IMPORTANT]
-
-Currently, OpenPrattle is not aware of which formats will preserve the specified charge
-and multiplicity. If an unsupported format is chosen, any charge and multiplicity information
-will be silently discarded.
+> [!IMPORTANT]
+> Currently, OpenPrattle is not aware of which formats will preserve the specified charge
+> and multiplicity. If an unsupported format is chosen, any charge and multiplicity information
+> will be silently discarded.
 
 Charge and multiplicity are only supported with the `Pybel_converter` backend. This means that to
 convert from a format that is not supported by pybel (most noticeably ChemDraw's .cdx), two
