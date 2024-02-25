@@ -167,6 +167,49 @@ output = Openbabel_converter.from_file(input_file_path = "Benzene.cdx").convert(
 )
 ```
 
+### Command-line
+
+The oprattle command-line tool has the following main syntax:
+
+```shell
+$ oprattle input_file [-i INPUT_FORMAT] [-o OUTPUT_FORMAT] -O OUTPUT_FILE
+```
+
+For example:
+
+```shell
+$ oprattle Benzene.xyz -O Benzene.cml
+```
+
+Explicit input and output formats can be specified using `[-i INPUT_FORMAT]` and 
+`[-o OUTPUT_FORMAT]` respectively.
+
+```shell
+$ oprattle Benzene.file1 -i xyz -o cml -O Benzene.file2
+```
+
+Either (or both) of the input file and output file can be omitted to read from
+stdin or to write to stdout:
+
+```shell
+$ cat Benzene.xyz | oprattle i xyz -o cml
+```
+
+The backend can be chosen with the ``--backend`` option:
+```shell
+$ oprattle Benzene.cdx -O Benzene.cml --backend Obabel
+```
+
+Charge, multiplicity, and 3D conversion can be set using ``--charge``,
+``--multiplicity``, and ``--gen3D`` respectively.
+
+```shell
+$ oprattle Benzene.cdx -O Benzene.cml --charge 1 --multiplicity 2 --gen3D True
+```
+
+The same caveats for charge, multiplicity, and gen3D apply as for the OpenPrattle library
+(see above).
+
 ## Why?
 
 On the surface, the pybel library and obabel tool appear to offer the same functionality. However, there are important instances where each offers functionality over the other. For example, pybel allows for the molecular charge and multiplicity to be set in some output formats, obabel does not.
