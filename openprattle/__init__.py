@@ -4,10 +4,10 @@ import sys
 from pathlib import Path
 
 # Version information.
-major_version = 0
+major_version = 1
 minor_version = 0
 revision = 0
-prerelease = 1
+prerelease = 0
 
 development = prerelease is not None
 
