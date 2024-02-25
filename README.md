@@ -131,7 +131,7 @@ Of these, only dalmol is both a readable and writable format.
 > will be silently discarded.
 
 Charge and multiplicity are only supported with the `Pybel_converter` backend. This means that to
-convert from a format that is not supported by pybel (most noticeably ChemDraw's .cdx), two
+convert from a format that is not supported by Pybel (most noticeably ChemDraw's .cdx), two
 conversions should be performed in sequence:
 ```
 from openprattle import Openbabel_converter, Pybel_converter
@@ -152,7 +152,7 @@ that are already in three-dimensions.
 
 The default behaviour in OpenPrattle (`gen3D = 'auto'`) is to convert geometries to three-dimensions so
 long as the coordinates are not already in 3D. The function to determine the input geometry dimensions
-is exposed by pybel, but not by the obabel command-line tool. This means that automatic conversion with
+is exposed by Pybel, but not by the obabel command-line tool. This means that automatic conversion with
 gen3D will only occur when using the Pybel backend, unless the input format is exclusively non-3D (such
 as ChemDraw's cdx).
 
@@ -160,7 +160,10 @@ The 3D conversion can be explicitly requested or disabled by using `gen3D = True
 respectively.
 
 ```
-output = Openbabel_converter.from_file(input_file_path = "Benzene.cdx").convert("xyz", gen3D = True)
+output = Openbabel_converter.from_file(input_file_path = "Benzene.cdx").convert(
+    "xyz",
+    gen3D = True
+)
 ```
 
 ## Why?
