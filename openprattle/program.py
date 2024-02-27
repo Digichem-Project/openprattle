@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import sys
 import argparse
 
@@ -98,10 +96,3 @@ def main():
         print(result, end = "")
 
     return 0
-
-
-    
-# If we've been invoked as a program, call main().    
-if __name__ == '__main__':
-    sys.exit(main())
-    
