@@ -23,3 +23,6 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/Digichem-Project/openprattle"
 Issues = "https://github.com/Digichem-Project/openprattle/issues"
+
+[project.scripts]
+oprattle = "openprattle.program:main"
