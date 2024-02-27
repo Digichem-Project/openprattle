@@ -42,8 +42,7 @@ jobs:
         python-version: "3.10"
     - name: Conda test
       run: |
-        conda info
-        conda list
+        oprattle --readable --backend Pybel
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
