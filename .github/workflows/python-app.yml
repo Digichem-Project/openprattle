@@ -15,6 +15,10 @@ permissions:
 jobs:
   build:
 
+    defaults:
+        run:
+          shell: bash -l {0}
+
     runs-on: ubuntu-latest
 
     steps:
@@ -22,6 +26,14 @@ jobs:
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
+        python-version: "3.10"
+    - name: Install conda
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        activate-environment: openprattle
+        auto-activate-base: false
+        environment-file: environment.yml
+        auto-update-conda: true
         python-version: "3.10"
     - name: Install dependencies
       run: |
@@ -36,4 +48,5 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
+        export PATH="bin:$PATH"
         pytest

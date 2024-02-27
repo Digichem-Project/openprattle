@@ -252,4 +252,3 @@ A light-hearted pun; 'prattle' and 'babel' are approximate synonyms.
 ## Licensing
 
 [OpenBabel](https://github.com/openbabel/openbabel) is licensed under GPL 2.0. Because OpenPrattle depends on the pybel library, it too must be licensed under the GPL.
-If this is not suitable for your needs, check out [FreePrattle](https://github.com/Digichem-Project/freeprattle) instead.
