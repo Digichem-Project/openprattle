@@ -19,10 +19,12 @@ try:
 
 except ModuleNotFoundError:
     # No bindings, carry on.
+    raise
     logging.debug("Could not load python pybel bindings; falling back to obabel executable", exc_info = True)
 
 except Exception:
     # Some other error occurred; print an error but continue.
+    raise
     logging.error("Found but could not load python pybel bindings; falling back to obabel executable", exc_info = True)
 
 # Formats that are broken with either pybel or obabel.
