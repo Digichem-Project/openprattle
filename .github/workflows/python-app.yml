@@ -40,6 +40,10 @@ jobs:
         environment-file: environment.yml
         auto-update-conda: true
         python-version: "3.10"
+    - name: Conda test
+      run: |
+        conda info
+        conda list
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
