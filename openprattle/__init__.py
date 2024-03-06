@@ -6,7 +6,7 @@ from pathlib import Path
 # Version information.
 major_version = 1
 minor_version = 0
-revision = 2
+revision = 3
 prerelease = None
 
 development = prerelease is not None
