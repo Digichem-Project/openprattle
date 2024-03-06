@@ -19,13 +19,13 @@ try:
 
 except ModuleNotFoundError:
     # No bindings, carry on.
-    raise
-    logging.debug("Could not load python pybel bindings; falling back to obabel executable", exc_info = True)
+    # TODO: This message is unreachable. Logging is not set to debug by default, and this module is imported before the user can ever change it.
+    logging.getLogger("openprattle").debug("Could not load python pybel bindings; falling back to obabel executable", exc_info = True)
 
 except Exception:
     # Some other error occurred; print an error but continue.
-    raise
-    logging.error("Found but could not load python pybel bindings; falling back to obabel executable", exc_info = True)
+    # TODO: Should we catch this?
+    logging.getLogger("openprattle").error("Found but could not load python pybel bindings; falling back to obabel executable", exc_info = True)
 
 # Formats that are broken with either pybel or obabel.
 # TODO: We should try and record which versions of obabel these are broken with; they may get fixed in the future. 
