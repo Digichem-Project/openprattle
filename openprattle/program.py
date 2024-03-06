@@ -3,6 +3,7 @@ import argparse
 
 import openprattle
 from openprattle import Openbabel_converter, HAVE_PYBEL, formats
+import openprattle.log
 
 def main():
     """
@@ -26,10 +27,14 @@ def main():
     parser.add_argument("--bindings", help = "Determine whether the pybel bindings are available", action = "store_true")
     parser.add_argument("--readable", help = "List readable (input) formats", action = "store_true")
     parser.add_argument("--writable", help = "List writable (output) formats", action = "store_true")
-    parser.add_argument("--json", help = "Dump the list of readable and/or writable formats in JSON", action = "store_true")
+    parser.add_argument("--json", help = "Dump the list of readable and/or writable formats in JSON, and dump warnings and errors in JSON", action = "store_true")
     parser.add_argument("-v", "--version", action = "version", version = str(openprattle.__version__))
 
     args = parser.parse_args()
+
+    # First, setup logging.
+    if args.json:
+        openprattle.log.init_logger(True)
 
     if args.bindings:
         if HAVE_PYBEL:

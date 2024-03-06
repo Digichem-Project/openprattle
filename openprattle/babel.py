@@ -8,7 +8,7 @@ import copy
 from pathlib import Path
 import logging
 
-import openprattle
+import openprattle.log
 
 # Try and load openbabel bindings.
 HAVE_PYBEL = False
@@ -58,7 +58,7 @@ class Openbabel_converter():
          - As a file path (input_file_path and optionally input_file_type)
         
         :param input_file: An open file descriptor in the format given by input_file_type that should be converted.
-        :param input_file_buffer: Alternartively, a buffer (unicode string or bytes) in the format given by input_file_type that should be converted.
+        :param input_file_buffer: Alternatively, a buffer (unicode string or bytes) in the format given by input_file_type that should be converted.
         :param input_file_path: Alternatively, a path to a file that should be converted.
         :param input_file_type: A shortcode identifying the format of the input file. If not given but input_file_path is given, then this will be determined automatically.
         """
@@ -193,7 +193,7 @@ if HAVE_PYBEL:
 
     class ObErrorLog_wrapper():
         """
-        Class for wrapping the logging begaviour of openbabel and pybel.
+        Class for wrapping the logging behaviour of openbabel and pybel.
         """
 
         def __init__(self, warnings_as_errors = True):
@@ -245,7 +245,7 @@ if HAVE_PYBEL:
             # Print any messages.
             for oblevel, level in log_levels:
                 for log in pybel.ob.obErrorLog.GetMessagesOfLevel(oblevel):
-                    logging.log(level, log)
+                    logging.getLogger("openprattle").log(level, log)
 
             # Generate exceptions.
             exceptions = []
@@ -357,7 +357,7 @@ if HAVE_PYBEL:
                 with ObErrorLog_wrapper(False):
                     dim = molecule.dim
 
-                logging.warning("Generating 3D coordinates from {}D file '{}'; this will scramble atom coordinates".format(dim, self.input_name))
+                logging.getLogger("openprattle").warning("Generating 3D coordinates from {}D file '{}'; this will scramble atom coordinates".format(dim, self.input_name))
                 
                 with ObErrorLog_wrapper(False):
                     molecule.localopt()
@@ -423,11 +423,11 @@ class Obabel_converter(Openbabel_converter):
         
         if charge is not None:
             # We can't set charge with obabel sadly.
-            logging.warning("Unable to set charge '{}' of molecule loaded from file '{}' with obabel converter".format(charge, self.input_name))
+            logging.getLogger("openprattle").warning("Unable to set charge '{}' of molecule loaded from file '{}' with obabel converter".format(charge, self.input_name))
             
         if multiplicity is not None:
             # We can't set charge with obabel sadly.
-            logging.warning("Unable to set multiplicity '{}' of molecule loaded from file '{}' with obabel converter".format(multiplicity, self.input_name))
+            logging.getLogger("openprattle").warning("Unable to set multiplicity '{}' of molecule loaded from file '{}' with obabel converter".format(multiplicity, self.input_name))
         
         # Run
         return self.run_obabel(output_file_type, output_file, gen3D = gen3D)
@@ -456,7 +456,7 @@ class Obabel_converter(Openbabel_converter):
         
         # Add gen3D command if we've been asked to.
         if gen3D:
-            logging.warning("Generating 3D coordinates from file '{}'; this will scramble atom coordinates".format(self.input_name))
+            logging.getLogger("openprattle").warning("Generating 3D coordinates from file '{}'; this will scramble atom coordinates".format(self.input_name))
             sig.append("--gen3D")
         
         # Add H if we've been asked.    
