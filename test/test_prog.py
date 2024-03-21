@@ -13,7 +13,7 @@ def run(signature):
 
     return subprocess.run(
         signature,
-
+        capture_output = True
     )
 
 @pytest.mark.parametrize("input_file_type", ["cml", "xyz", "cdx"])
@@ -55,3 +55,28 @@ def test_formats(format_type, backend):
         ])
 
     run(signature)
+
+@pytest.mark.parametrize("input_file_type", ["cml", "xyz", "cdx"])
+def test_gen3d(input_file_type):
+    first = run([
+        "oprattle",
+        str(Path(DATA, "Benzene.{}".format(input_file_type))),
+        "-o", "xyz",
+        "--gen3D", "False"
+    ]).stdout
+
+    same = run([
+        "oprattle",
+        str(Path(DATA, "Benzene.{}".format(input_file_type))),
+        "-o", "xyz",
+        "--gen3D", "False"
+    ]).stdout
+    different = run([
+        "oprattle",
+        str(Path(DATA, "Benzene.{}".format(input_file_type))),
+        "-o", "xyz",
+        "--gen3D", "True"
+    ]).stdout
+
+    assert first == same
+    assert first != different

@@ -297,9 +297,6 @@ if HAVE_PYBEL:
             # From python, we have no way to redirect the openbabel logger, so we need to hack it.
             # The ObErrorLog_wrapper() handles this.
             
-            # For Pybel, gen3D defaults to True, because we'll only use gen3d if not already in 3D.
-            gen3D = gen3D if gen3D is not None else True
-            
             # Get upset if input_file_type is empty (because openbabel acts weird when it is).
             if self.input_file_type is None or self.input_file_type == "":
                 raise TypeError("Cannot convert file; input_file_type '{}' is None or empty".format(self.input_file_type))
@@ -352,7 +349,7 @@ if HAVE_PYBEL:
                     molecule.OBMol.SetTotalSpinMultiplicity(multiplicity)
             
             # If we got a 2D (or 1D) format, convert to 3D (but warn that we are doing so.)
-            if molecule.dim != 3 and gen3D:
+            if (molecule.dim != 3 and gen3D is None) or gen3D:
                 # We're missing 3D coords.
                 with ObErrorLog_wrapper(False):
                     dim = molecule.dim
