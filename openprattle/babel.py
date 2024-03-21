@@ -196,7 +196,7 @@ if HAVE_PYBEL:
         Class for wrapping the logging behaviour of openbabel and pybel.
         """
 
-        def __init__(self, warnings_as_errors = True):
+        def __init__(self, warnings_as_errors = False):
             """
             :param stream: The output stream to wrap.
             :param warnings_as_errors: Whether to raise an exception on obabel warnings (normally a good idea)
