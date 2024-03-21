@@ -1,5 +1,6 @@
 import sys
 import argparse
+import logging
 
 import openprattle
 from openprattle import Openbabel_converter, HAVE_PYBEL, formats
@@ -87,13 +88,22 @@ def main():
         gen3D = None
 
     # Then convert.
-    result = converter.convert(
-        output_file = args.output_file if args.output_file != "-" else None,
-        output_file_type = args.output_format,
-        charge = args.charge,
-        multiplicity = args.multiplicity,
-        gen3D = gen3D
-    )
+    try:
+        result = converter.convert(
+            output_file = args.output_file if args.output_file != "-" else None,
+            output_file_type = args.output_format,
+            charge = args.charge,
+            multiplicity = args.multiplicity,
+            gen3D = gen3D
+        )
+    except Exception as e:
+        if args.json:
+            # If we've been asked nicely to play with other program, log the exception.
+            logging.getLogger("openprattle").error("An error occurred during file conversion", exc_info = True)
+            return -1
+        
+        else:
+            raise
 
     # If we're writing to stdout, print.
     # TODO: See if we can write directly to stdout from pybel.
