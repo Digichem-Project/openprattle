@@ -49,4 +49,5 @@ jobs:
     - name: Test with pytest
       run: |
         export PATH="bin:$PATH"
+        export PYTHONPATH="./:$PYTHONPATH"
         pytest
