@@ -13,7 +13,8 @@ def run(signature):
 
     return subprocess.run(
         signature,
-        capture_output = True
+        capture_output = True,
+        check = True
     )
 
 @pytest.mark.parametrize("input_file_type", ["cml", "xyz", "cdx"])
