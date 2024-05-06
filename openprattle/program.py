@@ -44,7 +44,7 @@ def main():
         else:
             print(False)
         
-        exit(0)
+        sys.exit(0)
     
     elif args.readable or args.writable:
         format = formats(args.backend)
