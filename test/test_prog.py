@@ -11,11 +11,17 @@ from test import DATA
 def run(signature):
     """Run a program."""
 
-    return subprocess.run(
+    proc = subprocess.run(
         signature,
-        capture_output = True,
-        check = True
+        capture_output = True
     )
+
+    if proc.returncode != 0:
+        # Something has gone wrong.
+        raise Exception("Command execution failed with retcode '{}', STDERR: {}".format(proc.returncode, proc.stderr))
+
+    return proc
+
 
 @pytest.mark.parametrize("input_file_type", ["cml", "xyz", "cdx"])
 @pytest.mark.parametrize("backend", [None, "Pybel", "Obabel"])
