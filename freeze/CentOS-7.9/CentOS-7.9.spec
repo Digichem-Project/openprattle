@@ -11,6 +11,7 @@ prog_name = "oprattle.exe"
 package_name = "CentOS-7.9"
 
 a = Analysis([script],
+     pathex=["../../"],
      binaries=binaries,
      datas=datas,
      hiddenimports=[],
@@ -47,5 +48,5 @@ coll = COLLECT(exe,
      strip=False,
      upx=True,
      upx_exclude=[],
-     name="{}.{}.{}".format("openprattle", openprattle.version, package_name)
+     name="{}.{}.{}".format("openprattle", openprattle.__version__, package_name)
 )
