@@ -23,8 +23,17 @@ def run(signature):
     return proc
 
 
-@pytest.mark.parametrize("input_file_type", ["cml", "xyz", "cdx"])
-@pytest.mark.parametrize("backend", [None, "Pybel", "Obabel"])
+@pytest.mark.parametrize("input_file_type, backend", [
+    ["cml", None],
+    ["cml", "Pybel"],
+    ["cml", "Obabel"],
+    ["xyz", None],
+    ["xyz", "Pybel"],
+    ["xyz", "Obabel"],
+    ["cdx", None],
+    ["cdx", "Obabel"],
+    # CDX cannot be converted with pybel
+])
 def test_conversion(input_file_type, backend, tmp_path):
     """Test simple file conversion."""
     
