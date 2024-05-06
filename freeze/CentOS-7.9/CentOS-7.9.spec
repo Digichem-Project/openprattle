@@ -11,6 +11,7 @@ prog_name = "oprattle.exe"
 package_name = "CentOS-7.9"
 
 a = Analysis([script],
+     pathex=["../../"],
      binaries=binaries,
      datas=datas,
      hiddenimports=[],
