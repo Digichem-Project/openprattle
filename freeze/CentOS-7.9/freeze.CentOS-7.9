@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Check which branch we're on to make sure we're not distributing non demo versions.
+git_vers=$(git symbolic-ref --short -q HEAD)
+expected_git_vers="main"
+
+if [ $git_vers != $expected_git_vers ]; then
+    echo "----------------------------------------------------------------------------"
+    echo "WARNING: Not on expected git branch" $expected_git_vers", on" $git_vers
+    echo "----------------------------------------------------------------------------"
+fi
+
+echo "Building..."
+
+if pyinstaller CentOS-7.9.spec --noconfirm; then
+    # Create master archive.
+    echo "Creating archive..."
+    cd dist
+    name=$(ls -d openprattle.*)
+    tar -czf "$name.tar.gz" "$name"
+
+fi
+
