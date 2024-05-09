@@ -9,13 +9,13 @@ from collect_licenses import find_licenses
 datas = []
 
 # Add openbabel data.
-datas.append((pathlib.Path(os.environ['CONDA_PREFIX'], "share/openbabel/3.1.0/"), "openbabel/data/3.1.0"))
+datas.append((Path(os.environ['CONDA_PREFIX'], "share/openbabel/3.1.0/"), "openbabel/data/3.1.0"))
 
 # Now add extra binary libraries that we need.
 binaries = [
-    (pathlib.Path(os.environ['CONDA_PREFIX'], "lib/openbabel/3.1.0/"), "openbabel/lib/3.1.0"),
+    (Path(os.environ['CONDA_PREFIX'], "lib/openbabel/3.1.0/"), "openbabel/lib/3.1.0"),
     # TODO: Do we still need this?
-    (pathlib.Path(os.environ['CONDA_PREFIX'], "lib/libinchi.so.0"), ".")
+    (Path(os.environ['CONDA_PREFIX'], "lib/libinchi.so.0"), ".")
 ]
 
 script = "../../bin/oprattle"
