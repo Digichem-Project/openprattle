@@ -33,12 +33,11 @@ export BUILD_TARGET="$1"
 echo "Building..."
 
 if pyinstaller oprattle.general.spec --noconfirm; then
-    echo "Skipping archive"
     # Create master archive.
-    #echo "Creating archive..."
-    #cd dist
-    #name=$(ls -d openprattle.*)
-    #tar -czf "$name.tar.gz" "$name"
+    echo "Creating archive..."
+    cd dist
+    name=$(ls -d openprattle.*)
+    tar -czf "$name.tar.gz" "$name"
 
 fi
 
