@@ -10,9 +10,29 @@ if [ $git_vers != $expected_git_vers ]; then
     echo "----------------------------------------------------------------------------"
 fi
 
+case "$1" in
+    
+    "CentOS-7.9")
+        echo "Building for CentOS-7.9"
+        ;;
+    
+    "CentOS-8.5")
+        echo "Building for CentOS-8.5"
+        ;;
+
+    *)
+        echo "Unrecognised build target $1"
+        exit
+        ;;
+
+esac
+
+# Set target.
+export BUILD_TARGET="$1"
+
 echo "Building..."
 
-if pyinstaller CentOS-7.9.spec --noconfirm; then
+if pyinstaller oprattle.general.spec --noconfirm; then
     # Create master archive.
     echo "Creating archive..."
     cd dist

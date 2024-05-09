@@ -7,8 +7,8 @@ sys.path.insert(0,str(Path("./").resolve()))
 from base import binaries, datas
 
 script = "../../bin/oprattle"
-prog_name = "oprattle.exe"
-package_name = "CentOS-7.9"
+prog_name = "oprattle"
+package_name = os.environ['BUILD_TARGET']
 
 a = Analysis([script],
      pathex=["../../"],
