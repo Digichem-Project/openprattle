@@ -20,6 +20,10 @@ case "$1" in
         echo "Building for CentOS-8.5"
         ;;
 
+    "CentOS-Stream-8")
+        echo "Building for CentOS-Stream-8"
+        ;;
+
     *)
         echo "Unrecognised build target $1"
         exit
