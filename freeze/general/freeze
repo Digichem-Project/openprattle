@@ -38,10 +38,10 @@ echo "Building..."
 
 if pyinstaller oprattle.general.spec --noconfirm; then
     # Create master archive.
-    #echo "Creating archive..."
-    #cd dist
-    #name=$(ls -d openprattle.*)
-    #tar -czf "$name.tar.gz" "$name"
+    echo "Creating archive..."
+    cd dist
+    name=$(ls -d openprattle.*)
+    tar -czf "$name.tar.gz" "$name"
 
 fi
 
