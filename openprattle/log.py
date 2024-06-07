@@ -8,6 +8,9 @@ from subprocess import CalledProcessError
 
 LOGGING_HANDLER = None
 
+def filter_kekulize(record):
+    return not "Failed to kekulize aromatic bonds" in record.getMessage()
+
 def init_logger(json = False):
     """
     Init the package wide logger.
@@ -35,6 +38,10 @@ def init_logger(json = False):
         formatter = JSON_formatter()
 
     LOGGING_HANDLER.setFormatter(formatter)
+
+    # Setup filters.
+    # TODO: This should be optional.
+    logger.addFilter(filter_kekulize)
     
     # Remove old handlers.
     loggers = (logger, warnings_logger)
