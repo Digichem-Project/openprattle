@@ -124,7 +124,7 @@ class Openbabel_converter():
             
             else:
                 # No file given.
-                raise ValueError("Could not automaticlly determine file format; no file name was given") from None
+                raise ValueError("Could not automatically determine file format; no file name was given") from None
         
         # Get file extension (removing the dot character).
         extension = input_file_name.suffix[1:]
