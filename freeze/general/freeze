@@ -10,27 +10,12 @@ if [ $git_vers != $expected_git_vers ]; then
     echo "----------------------------------------------------------------------------"
 fi
 
-case "$1" in
-    
-    "CentOS-7.9")
-        echo "Building for CentOS-7.9"
-        ;;
-    
-    "CentOS-8.5")
-        echo "Building for CentOS-8.5"
-        ;;
-
-    "CentOS-Stream-8")
-        echo "Building for CentOS-Stream-8"
-        ;;
-
-    *)
-        echo "Unrecognised build target $1"
-        exit
-        ;;
-
-esac
-
+if [ "$1" == "" ]; then
+    echo "ERROR: No build target specified."
+    exit
+else
+    echo "Building for $1"
+fi
 # Set target.
 export BUILD_TARGET="$1"
 
