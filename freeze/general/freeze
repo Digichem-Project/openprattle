@@ -23,6 +23,7 @@ echo "Building..."
 
 if pyinstaller oprattle.general.spec --noconfirm; then
     # Create master archive.
+    rm -R ../build
     echo "Creating archive..."
     cd dist
     name=$(ls -d openprattle.*)
