@@ -67,8 +67,6 @@ class Openbabel_converter():
         self.input_file_buffer = input_file_buffer
         self.input_file_path = input_file_path
         self.input_file_type = input_file_type
-        # Currently, we always use add H because certain formats (xyz) cannot have H added.
-        self.add_H = True
         
     @classmethod
     def from_file(self, *,
@@ -173,7 +171,7 @@ class Openbabel_converter():
         else:
             return "(file loaded from memory)"
 
-    def convert(self, output_file_type = None, output_file = None, *, gen3D = None, charge = None, multiplicity = None):
+    def convert(self, output_file_type = None, output_file = None, *, gen3D = None, add_H = None, charge = None, multiplicity = None):
         """
         Convert the input file wrapped by this class to the designated output_file_type.
         
@@ -266,7 +264,7 @@ if HAVE_PYBEL:
         Wrapper class for pybel
         """            
         
-        def convert(self, output_file_type = None, output_file = None, *, gen3D = None, charge = None, multiplicity = None):
+        def convert(self, output_file_type = None, output_file = None, *, gen3D = None, add_H = None, charge = None, multiplicity = None):
             """
             Convert the input file wrapped by this class to the designated output_file_type.
             
@@ -348,21 +346,21 @@ if HAVE_PYBEL:
                 with ObErrorLog_wrapper(False):
                     molecule.OBMol.SetTotalSpinMultiplicity(multiplicity)
             
-            # If we got a 2D (or 1D) format, convert to 3D (but warn that we are doing so.)
-            if (molecule.dim != 3 and gen3D is None) or gen3D:
-                # We're missing 3D coords.
+            with ObErrorLog_wrapper(False):
+                dim = molecule.dim
+            
+            if (dim != 3 and add_H is None) or add_H:
+                # Add hydrogens.
                 with ObErrorLog_wrapper(False):
-                    dim = molecule.dim
-
+                    molecule.addh()
+            
+            # If we got a 2D (or 1D) format, convert to 3D (but warn that we are doing so.)
+            if (dim != 3 and gen3D is None) or gen3D:
+                # We're missing 3D coords.
                 logging.getLogger("openprattle").warning("Generating 3D coordinates from {}D file '{}'; this will scramble atom coordinates".format(dim, self.input_name))
                 
                 with ObErrorLog_wrapper(False):
                     molecule.localopt()
-                
-            if self.add_H:
-                # Add hydrogens.
-                with ObErrorLog_wrapper(False):
-                    molecule.addh()
             
             # Now convert and return
             # If the format is png, use the draw() method instead because write() is bugged.
@@ -388,7 +386,7 @@ class Obabel_converter(Openbabel_converter):
     # 'Path' to the obabel executable.
     obabel_execuable = "obabel"        
     
-    def convert(self, output_file_type, output_file = None, *, gen3D = None, charge = None, multiplicity = None):
+    def convert(self, output_file_type, output_file = None, *, gen3D = None, add_H = None, charge = None, multiplicity = None):
         """
         Convert the input file wrapped by this class to the designated output_file_type.
          
@@ -411,7 +409,13 @@ class Obabel_converter(Openbabel_converter):
         #if output_file_type in FORBIDDEN['OBABEL']:
         #    raise ValueError("The '{}' format is not supported by obabel, try pybel instead".format(output_file_type))
         
-        # For Obabel, gen3D defaults to False, because we can't determine ahead of time whether we're in 3D or not (unless format is cdx, which is always 2D).
+        # For Obabel, gen3D and addH defaults to False, because we can't determine ahead of time whether we're in 3D or not (unless format is cdx, which is always 2D).
+        if add_H is None:
+            if self.input_file_type.lower() == "cdx":
+                add_H = True
+            else:
+                add_H = False
+
         if gen3D is None:
             if self.input_file_type.lower() == "cdx":
                 gen3D = True
@@ -427,9 +431,9 @@ class Obabel_converter(Openbabel_converter):
             logging.getLogger("openprattle").warning("Unable to set multiplicity '{}' of molecule loaded from file '{}' with obabel converter".format(multiplicity, self.input_name))
         
         # Run
-        return self.run_obabel(output_file_type, output_file, gen3D = gen3D)
+        return self.run_obabel(output_file_type, output_file, gen3D = gen3D, add_H = add_H)
         
-    def run_obabel(self, output_file_type, output_file, *, gen3D):
+    def run_obabel(self, output_file_type, output_file, *, gen3D, add_H):
         """
         Run obabel, converting the input file wrapped by this class to the designated output_file_type.
         
@@ -457,7 +461,7 @@ class Obabel_converter(Openbabel_converter):
             sig.append("--gen3D")
         
         # Add H if we've been asked.    
-        if self.add_H:
+        if add_H:
             sig.append("-h")
             
         # If a file to write to has been given, set it.
