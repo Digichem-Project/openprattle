@@ -96,3 +96,33 @@ def test_gen3d(input_file_type):
 
     assert first == same
     assert first != different
+
+
+
+@pytest.mark.parametrize("backend", ["Pybel", "Obabel"])
+def test_addh(backend):
+    first = run([
+        "oprattle",
+        str(Path(DATA, "Benzene_implicit.cml")),
+        "-o", "xyz",
+        "--addH", "False",
+        "--backend", backend
+    ]).stdout
+
+    same = run([
+        "oprattle",
+        str(Path(DATA, "Benzene_implicit.cml")),
+        "-o", "xyz",
+        "--addH", "False",
+        "--backend", backend
+    ]).stdout
+    different = run([
+        "oprattle",
+        str(Path(DATA, "Benzene_implicit.cml")),
+        "-o", "xyz",
+        "--addH", "True",
+        "--backend", backend
+    ]).stdout
+
+    assert first == same
+    assert first != different

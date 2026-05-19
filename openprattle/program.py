@@ -22,8 +22,9 @@ def main():
     parser.add_argument("-O", "--output_file", help = "Output file to write to. If not given, the file will be written to stdout.", default = "-")
     parser.add_argument("-C", "--charge", help = "The molecular charge to set in the output format. Note that not all formats support a charge.", default = None, type = int)
     parser.add_argument("-M", "--multiplicity", help = "The multiplicity to set in the output format. Note that not all formats support a multiplicity", default = None, type = int)
+    parser.add_argument("--addH", help = "Whether to convert implicit hydrogens to explicit hydrogens. This option is useful for converting 1D or 2D formats to 3D. The default (Auto) is to add Hs if converting from a 1D or 2D format.", choices = ["True", "Auto", "False"])
     parser.add_argument("--gen3D", help = "Whether to optimise the input coordinates via a rapid force-field optimisation. This option is useful for converting 1D or 2D formats to 3D. The default (Auto) is to only optimise coordinates that are not already in 3 dimensions.", choices = ["True", "Auto", "False"])
-    parser.add_argument("--backend", help = "Force the user of a particular backend", choices = ["Auto", "Pybel", "Obabel"])
+    parser.add_argument("--backend", help = "Force the use of a particular backend", choices = ["Auto", "Pybel", "Obabel"])
     
     parser.add_argument("--bindings", help = "Determine whether the pybel bindings are available", action = "store_true")
     parser.add_argument("--readable", help = "List readable (input) formats", action = "store_true")
@@ -77,6 +78,16 @@ def main():
         backend = args.backend
     )
 
+    # Handle addH.
+    if args.addH == "True":
+        addH = True
+    
+    elif args.addH == "False":
+        addH = False
+
+    else:
+        addH = None
+
     # Handle gen3D.
     if args.gen3D == "True":
         gen3D = True
@@ -94,9 +105,10 @@ def main():
             output_file_type = args.output_format,
             charge = args.charge,
             multiplicity = args.multiplicity,
-            gen3D = gen3D
+            gen3D = gen3D,
+            add_H = addH
         )
-    except Exception as e:
+    except Exception:
         if args.json:
             # If we've been asked nicely to play with other program, log the exception.
             logging.getLogger("openprattle").error("An error occurred during file conversion", exc_info = True)

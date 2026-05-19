@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "openprattle"
 version = "1.1.2"
 authors = [
-    {name = "Oliver S. Lee", email = "osl@digi-chem.ac.uk"},
+    {name = "Oliver S. Lee", email = "osl@digi-chem.co.uk"},
 ]
 description = "A convenience wrapper for seamlessly accessing the pybel library and obabel command-line tools"
 dependencies = [
